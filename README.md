@@ -1,5 +1,5 @@
 # intro #
-golor is a tool for golang source code coloring
+golor is a command line tool for golang source code coloring
 # how to build #
 `git clone 'git://github.com/hantuo/golor.git'`
 
