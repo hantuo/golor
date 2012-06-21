@@ -31,38 +31,15 @@ const (
 	F_WHITE   = "\033[37m"
 
 	// background
-	B_BLACK   = "\033[40m" // 黑
-	B_RED     = "\033[41m" // 红
-	B_GREEN   = "\033[42m" // 绿
-	B_YELLOW  = "\033[43m" // 黄
-	B_BLUE    = "\033[44m" // 蓝
-	B_MAGENTA = "\033[45m" // 品红
-	B_CYAN    = "\033[46m" // 青
-	B_WHITE   = "\033[47m" // 白
+	B_BLACK   = "\033[40m"
+	B_RED     = "\033[41m"
+	B_GREEN   = "\033[42m"
+	B_YELLOW  = "\033[43m"
+	B_BLUE    = "\033[44m"
+	B_MAGENTA = "\033[45m"
+	B_CYAN    = "\033[46m"
+	B_WHITE   = "\033[47m"
 )
-
-var types = map[string]bool{
-        "bool":       true,
-        "byte":       true,
-        "complex64":  true,
-        "complex128": true,
-        "error":      true,
-        "float32":    true,
-        "float64":    true,
-        "int":        true,
-        "int8":       true,
-        "int16":      true,
-        "int32":      true,
-        "int64":      true,
-        "rune":       true,
-        "string":     true,
-        "uint":       true,
-        "uint8":      true,
-        "uint16":     true,
-        "uint32":     true,
-        "uint64":     true,
-        "uintptr":    true,
-}
 
 var Config = map[token.Token]string{
 	token.ILLEGAL: C_NULL,
@@ -163,12 +140,18 @@ var Config = map[token.Token]string{
 	token.SELECT: F_YELLOW,
 	token.STRUCT: F_YELLOW,
 	token.SWITCH: F_YELLOW,
-	token.TYPE:   F_YELLOW,
+	token.TYPE:   C_BRIGHT + F_YELLOW,
 	token.VAR:    F_YELLOW,
 }
 
 func main() {
-	src, err := ioutil.ReadAll(os.Stdin)
+	var src []byte
+	var err error
+	if len(os.Args) > 1 {
+		src, err = ioutil.ReadFile(os.Args[1])
+	} else {
+		src, err = ioutil.ReadAll(os.Stdin)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -178,6 +161,7 @@ func main() {
 	file := fset.AddFile("", fset.Base(), len(src))
 	s.Init(file, src, nil, scanner.ScanComments)
 	index := 0
+	out := ""
 	for {
 		pos, tok, lit := s.Scan()
 		if tok == token.EOF { break }
@@ -186,9 +170,8 @@ func main() {
 		if lit == "" { lit = tok.String() }
 		n := file.Offset(pos)
 		begin, end := n, n + len(lit)
-		s := string(src[index:begin]) + c + string(src[begin:end]) + C_RESET
-		fmt.Print(s)
+		out += string(src[index:begin]) + c + string(src[begin:end]) + C_RESET
 		index = end
 	}
-	fmt.Println()
+	fmt.Println(out)
 }
